@@ -211,7 +211,6 @@ def payment_slip():
     response = {}
 
     if request.method == "POST":
-        cashier_id = request.form['CST_id']
         name_of_customer = request.form['Name_of_customer']
         name_of_cashier = request.form['Name_of_cashier']
         total_amount = request.form['total_amount']
@@ -219,10 +218,9 @@ def payment_slip():
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO tlbPayment("
-                           "CST_id,"
                            "Name_of_customer,"
                            "Name_of_cashier,"
-                           "total_amount) VALUES(?, ?, ?, ?)", (cashier_id, name_of_cashier, name_of_customer, total_amount))
+                           "total_amount) VALUES(?, ?, ?)", (name_of_cashier, name_of_customer, total_amount))
             conn.commit()
             response["status_code"] = 201
             response["description"] = "Cashier Added successfully"
@@ -243,7 +241,7 @@ def employee():
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO tlbPayment("
+            cursor.execute("INSERT INTO tlbEmployee("
                             "Employee_name,"
                             "Employee_surname,"
                             "Position,"
@@ -318,7 +316,7 @@ def view_payslip():
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
         cursor.row_factory = sqlite3.Row
-        cursor.execute("SELECT * FROM tlbPayments")
+        cursor.execute("SELECT * FROM tlbPayment")
         results = cursor.fetchall()
         pay = []
 
@@ -351,12 +349,12 @@ def view_employee():
 # ------------------------- Removing/Deleting my Information------------------------------
 
 
-@app.route('/delete-customer/<int:customer_id>')
+@app.route('/delete-customer/<int:customer_id>', methods=['POST'])
 def remove_customer(customer_id):
     response = {}
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbCustomers WHERE id=?" + str(customer_id))
+        cursor.execute("DELETE FROM tlbCustomers WHERE CST_id=" + str(customer_id))
         conn.commit()
         response['status_code'] = 200
         response['message'] = "Customer Removed Successfully"
@@ -364,13 +362,13 @@ def remove_customer(customer_id):
     return response
 
 
-@app.route("/delete-reservation/<int:reservation_id>")
+@app.route("/delete-reservation/<int:reservation_id>", methods=['POST'])
 def remove_reservation(reservation_id):
     response = {}
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbReservation WHERE id=?" + str(reservation_id))
+        cursor.execute("DELETE FROM tlbReservation WHERE RES_id=" + str(reservation_id))
         conn.commit()
         response['status_code'] = 200
         response['message'] = "Reservation Cancelled Successfully"
@@ -378,13 +376,13 @@ def remove_reservation(reservation_id):
     return response
 
 
-@app.route("/delete-payment", methods=["POST"])
+@app.route("/delete-payment/<int:payment_id>", methods=["POST"])
 def remove_payment(payment_id):
     response = {}
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbPayment WHERE id=?" + str(payment_id))
+        cursor.execute("DELETE FROM tlbPayment WHERE Pay_id=" + str(payment_id))
         conn.commit()
         response['status_code'] = 200
         response['message'] = "Payment Cancelled Successfully"
@@ -398,7 +396,7 @@ def remove_cashier(cashier_id):
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbCashier WHERE id=?" + str(cashier_id))
+        cursor.execute("DELETE FROM tlbCashier WHERE Cash_id=" + str(cashier_id))
         conn.commit()
         response['status_code'] = 200
         response['message'] = "Cashier Removed Successfully"
@@ -435,7 +433,7 @@ def update_customer(customer_id):
                 put_data["firstname"] = incoming_data.get("firstname")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbCustomers SET firstname=? WHERE CST_id=?", (put_data["firstname"], customer_id))
+                    cursor.execute("UPDATE tlbCustomers SET firstname=? WHERE CST_id=", (put_data["firstname"], customer_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -445,7 +443,7 @@ def update_customer(customer_id):
                 put_data["lastname"] = incoming_data.get("lastname")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE ltbCustomers SET lastname=? WHERE CST_id=?", (put_data["lastname"], customer_id))
+                    cursor.execute("UPDATE ltbCustomers SET lastname=? WHERE CST_id=", (put_data["lastname"], customer_id))
                     conn.commit()
                     response['message'] = "Updating Customer Last Name successfully"
                     response['status_code'] = 200
@@ -454,7 +452,7 @@ def update_customer(customer_id):
                 put_data["contact"] = incoming_data.get("contact")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbCustomers SET contact=? WHERE CST_id=?", (put_data["contact"], customer_id))
+                    cursor.execute("UPDATE tlbCustomers SET contact=? WHERE CST_id=", (put_data["contact"], customer_id))
                     conn.commit()
                     response['message'] = "Updating Customer Contact successfully"
                     response['status_code'] = 200
@@ -463,7 +461,7 @@ def update_customer(customer_id):
                 put_data['password'] = incoming_data.get('password')
                 with sqlite3.connect('restaurant.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute('UPDATE tlbCustomers password=? WHERE CST_id=?', (put_data['password'], customer_id))
+                    cursor.execute('UPDATE tlbCustomers password=? WHERE CST_id=', (put_data['password'], customer_id))
                     conn.commit()
                     response['message'] = "Updating Password Successfully"
                     return response
@@ -472,7 +470,7 @@ def update_customer(customer_id):
                 put_data['email'] = incoming_data.get('email')
                 with sqlite3.connect('restaurant.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute('UPDATE tlbCustomers email=? WHERE CST_id=?', (put_data['email'], customer_id))
+                    cursor.execute('UPDATE tlbCustomers email=? WHERE CST_id=', (put_data['email'], customer_id))
                     conn.commit()
                     response['message'] = "Updating Email Successfully"
                     return response
@@ -491,7 +489,7 @@ def update_reservation(reservation_id):
                 put_data["Res_event"] = incoming_data.get("Res_event")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbReservation SET Res_event=? WHERE RES_id=?", (put_data["Res_event"], reservation_id))
+                    cursor.execute("UPDATE tlbReservation SET Res_event=? WHERE RES_id=", (put_data["Res_event"], reservation_id))
                     conn.commit()
                     response['message'] = "Updating Customer Reservation Event Successful"
                     response['status_code'] = 200
@@ -501,7 +499,7 @@ def update_reservation(reservation_id):
                 put_data["No_of_person"] = incoming_data.get("No_of_person")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE ltbReservation SET No_of_person=? WHERE RES_id=?", (put_data["No_of_person"], reservation_id))
+                    cursor.execute("UPDATE ltbReservation SET No_of_person=? WHERE RES_id=", (put_data["No_of_person"], reservation_id))
                     conn.commit()
                     response['message'] = "Updating Customer Reservation successfully"
                     response['status_code'] = 200
@@ -510,7 +508,7 @@ def update_reservation(reservation_id):
                 put_data["Res_date"] = incoming_data.get("Res_date")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbReservation SET Res_date=? WHERE RES_id=?", (put_data["Res_date"], reservation_id))
+                    cursor.execute("UPDATE tlbReservation SET Res_date=? WHERE RES_id=", (put_data["Res_date"], reservation_id))
                     conn.commit()
                     response['message'] = "Updating Customer Reservation Date successfully"
                     response['status_code'] = 200
@@ -519,7 +517,7 @@ def update_reservation(reservation_id):
                 put_data['image'] = incoming_data.get('image')
                 with sqlite3.connect('restaurant.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute('UPDATE tlbReservation image=? WHERE RES_id=?', (put_data['image'], reservation_id))
+                    cursor.execute('UPDATE tlbReservation image=? WHERE RES_id=', (put_data['image'], reservation_id))
                     conn.commit()
                     response['message'] = "Updating Reservation Image Successfully"
                     return response
@@ -538,7 +536,7 @@ def update_payment(payment_id):
                 put_data["Name_of_customer"] = incoming_data.get("Name_of_customer")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbPayment SET Name_of_customer=? WHERE Pay_id=?", (put_data["Name_of_customer"], payment_id))
+                    cursor.execute("UPDATE tlbPayment SET Name_of_customer=? WHERE Pay_id=", (put_data["Name_of_customer"], payment_id))
                     conn.commit()
                     response['message'] = "Updating Customer Name Successful"
                     response['status_code'] = 200
@@ -548,7 +546,7 @@ def update_payment(payment_id):
                 put_data["Name_of_cashier"] = incoming_data.get("Name_of_cashier")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE ltbPayment SET Name_of_cashier=? WHERE Pay_id=?", (put_data["Name_of_cashier"], payment_id))
+                    cursor.execute("UPDATE ltbPayment SET Name_of_cashier=? WHERE Pay_id=", (put_data["Name_of_cashier"], payment_id))
                     conn.commit()
                     response['message'] = "Updating Customer Payment successfully"
                     response['status_code'] = 200
@@ -557,7 +555,7 @@ def update_payment(payment_id):
                 put_data["Res_date"] = incoming_data.get("Res_date")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbPayment SET Res_date=? WHERE Pay_id=?", (put_data["Res_date"], payment_id))
+                    cursor.execute("UPDATE tlbPayment SET Res_date= WHERE Pay_id=", (put_data["Res_date"], payment_id))
                     conn.commit()
                     response['message'] = "Updating Customer Payment Date successfully"
                     response['status_code'] = 200
