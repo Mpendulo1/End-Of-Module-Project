@@ -49,54 +49,64 @@ def customers():
     conn.close()
 
 
-def reservation():
+def vehicles():
     with sqlite3.connect("restaurant.db") as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS tlbReservation(RES_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                     "name_of_person TXT NOT NULL,"
-                     "Res_event TXT NOT NULL,"
-                     "No_of_person INTEGER NOT NULL,"
-                     "Res_date TXT NOT NULL,"
-                     "image_url TXT NOT NULL,"
-                     "CONSTRAINT fk_customer FOREIGN KEY (name_of_person) REFERENCES user(CST_id))")
+        conn.execute("CREATE TABLE IF NOT EXISTS tlbVehicles(VHC_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "name TXT NOT NULL,"
+                     "brand TXT NOT NULL,"
+                     "type INTEGER NOT NULL,"
+                     "price TXT NOT NULL,"
+                     "year TXT NOT NULL,"
+                     "description TXT NOT NULL,"
+                     "transition TXT NOT NULL,"
+                     "image TXT NOT NULL,"
+                     "CONSTRAINT fk_customer FOREIGN KEY (name) REFERENCES user(CST_id))")
         print("Reservation table created successfully")
 
 
-def cashier():
+def sales():
     with sqlite3.connect("restaurant.db") as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS tlbCashier(Cash_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                     "Fullname TEXT NOT NULL,"
-                     "Lastname TXT NOT NULL,"
-                     "Address TXT NOT NULL,"
-                     "Phone_no INTEGER NOT NULL,"
-                     "image_url TXT NOT NULL,"
-                     "CONSTRAINT fk_employee FOREIGN KEY (Fullname) REFERENCES user(Employee_id))")
+        conn.execute("CREATE TABLE IF NOT EXISTS tlbSales(Sale_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "sale_date TEXT NOT NULL,"
+                     "payment_info TXT NOT NULL,"
+                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_info) REFERENCES tlbVehicles(VHC_id),"
+                     "CONSTRAINT fk_employee FOREIGN KEY (sale_date) REFERENCES tlbCustomers(CST_id))")
         print("Cashier table created successfully")
 
 
-def payment():
+def insurance_type():
     with sqlite3.connect("restaurant.db") as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS tlbPayment(Pay_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                     "Name_of_customer TEXT NOT NULL,"
-                     "Name_of_cashier TXT NOT NULL,"
-                     "total_amount TXT NOT NULL,"
-                     "CONSTRAINT fk_customer FOREIGN KEY (Name_of_customer) REFERENCES user(CST_id),"
-                     "CONSTRAINT fk_customer FOREIGN KEY (Name_of_cashier) REFERENCES user(Cash_id))")
+        conn.execute("CREATE TABLE IF NOT EXISTS tlbInsurance_type(INS_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "insurance_period TEXT NOT NULL,"
+                     "amount TXT NOT NULL,"
+                     "insurance_condition TXT NOT NULL)")
         print("Payment table created successfully")
 
 
-def employee():
+def insurance_provider():
     with sqlite3.connect("restaurant.db") as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS tlbEmployee(Employee_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                     "Employee_name TXT NOT NULL,"
-                     "Employee_surname TEXT NOT NULL,"
-                     "Position TXT NOT NULL,"
-                     "Hire_date TXT NOT NULL,"
-                     "Salary INTEGER NOT NULL,"
-                     "image_url TXT NOT NULL)")
+        conn.execute("CREATE TABLE IF NOT EXISTS tlbInsurance_provider(Insure_prov_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "address TXT NOT NULL,"
+                     "phone TEXT NOT NULL,"
+                     "website TXT NOT NULL,"
+                     "special_condition TXT NOT NULL,"
+                     "licence TXT NOT NULL)")
         print("Employee table created successfully")
 
-def menu():
-    pass
+def registered_insurance():
+    with sqlite3.connect("restaurant.db") as conn:
+        conn.execute("CREATE TABLE IF NOT EXISTS tlbRegisteredInsurance(Reg_insurance_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "start_date TXT NOT NULL,"
+                     "end_date TEXT NOT NULL,"
+                     "payment_information TXT NOT NULL,"
+                     "special_features TXT NOT NULL,"
+                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(VHC_id),"
+                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(Insure_prov_id),"
+                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(Sale_id),"
+                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(INS_id),"
+                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(CST_id))")
+        print("Employee table created successfully")
+
 
 def fetch_customers():
     with sqlite3.connect('restaurant.db') as db:
@@ -111,10 +121,11 @@ def fetch_customers():
 
 
 customers()
-reservation()
-cashier()
-payment()
-employee()
+vehicles()
+sales()
+registered_insurance()
+insurance_provider()
+insurance_type()
 user = fetch_customers()
 
 customer_table = {u.email: u for u in user}
@@ -155,104 +166,127 @@ def user_registration():
         return response
 
 
-@app.route('/book-reservation', methods=["POST"])
-def book_reservation():
+@app.route('/create-vehicles', methods=['POST'])
+def create_vehicles():
     response = {}
 
     if request.method == "POST":
-        person = request.form['name_of_person']
-        reservation_event = request.form['Res_event']
-        no_of_person = request.form['No_of_person']
-        reservation_date = request.form['Res_date']
-        image = request.form['image_url']
 
-        with sqlite3.connect("restaurant.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO tlbReservation("
-                           "name_of_person,"
-                           "Res_event,"
-                           "No_of_person,"
-                           "Res_date,"
-                           "image_url) VALUES (?, ?, ?, ?,?)", (person, reservation_event, no_of_person, reservation_date, image))
-            conn.commit()
-            response["status_code"] = 201
-            response["description"] = "Reservation Booked successfully"
-        return response
-
-
-@app.route('/cashier-profile', methods=["POST"])
-def cashier_profile():
-    response = {}
-    
-    if request.method == "POST":
-        # employee_id = request.form['Employee_id']
-        fullname = request.form['Fullname']
-        lastname = request.form['Lastname']
-        address = request.form['Address']
-        phone_no = request.form['Phone_no']
-        image = request.form["image_url"]
-        
+        name = request.form['name']
+        brand = request.form['brand']
+        type = request.form['type']
+        price = request.form['price']
+        year = request.form['year']
+        description = request.form['description']
+        transition = request.form['transtion']
+        image = request.form['image']
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO tlbCashier("
-                           "Fullname,"
-                           "Lastname,"
-                           "Address,"
-                           "image_url,"
-                           "Phone_no) VALUES(?, ?, ?, ?,?)", (fullname, lastname, address, phone_no, image))
+            cursor.execute("INSERT INTO tlbVehicles("
+                           "name,"
+                           "brand,"
+                           "type,"
+                           "price,"
+                           "year,"
+                           "description,"
+                           "transition,"
+                           "image) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                           (name, brand, type, price, year, description, transition, image))
             conn.commit()
-            response["status_code"] = 201
-            response["description"] = "Cashier Added successfully"
+            response["message"] = "Registration Vehicles  Successfully "
+            response["status_code"] = 200
         return response
 
 
-@app.route('/payment-details', methods=["POST"])
-def payment_slip():
+@app.route('/create-sales', methods=['POST'])
+def create_sales():
     response = {}
 
     if request.method == "POST":
-        name_of_customer = request.form['Name_of_customer']
-        name_of_cashier = request.form['Name_of_cashier']
-        total_amount = request.form['total_amount']
+        sales_date = request.form['sales_date']
+        payment_info = request.form['payment_info']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO tlbPayment("
-                           "Name_of_customer,"
-                           "Name_of_cashier,"
-                           "total_amount) VALUES(?, ?, ?)", (name_of_cashier, name_of_customer, total_amount))
+            cursor.execute("INSERT INTO tlbSales("
+                           "sales_date,"
+                           "payment_info) VALUES(?, ?)",
+                           (sales_date, payment_info))
             conn.commit()
-            response["status_code"] = 201
-            response["description"] = "Cashier Added successfully"
+            response["message"] = "Registration sales  Successfully "
+            response["status_code"] = 200
         return response
 
 
-@app.route('/employee-profile', methods=["POST"])
-def employee():
+@app.route('/create-insurance-type', methods=['POST'])
+def insurance_type():
     response = {}
 
     if request.method == "POST":
-        employee_name = request.form['Employee_name']
-        employee_surname = request.form['Employee_surname']
-        position = request.form['Position']
-        hire_date = request.form['Hire_date']
-        salary = request.form['Salary']
-        image_url = request.form['image_url']
+        period = request.form['insurance_period']
+        amount = request.form['amount']
+        condition = request.form['insurance_condition']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO tlbEmployee("
-                            "Employee_name,"
-                            "Employee_surname,"
-                            "Position,"
-                            "Hire_date,"
-                            "Salary,"
-                            "image_url) VALUES(?, ?, ?, ?, ?, ?)",
-                            (employee_name, employee_surname, position, hire_date, salary, image_url))
+            cursor.execute("INSERT INTO tlbInsurance_type("
+                           "insurance_period,"
+                           "amount,"
+                           "insurance_condition) VALUES(?, ?, ?)",
+                           (period, amount, condition))
             conn.commit()
-            response["status_code"] = 201
-            response["description"] = "Employee Added successfully"
+            response["message"] = "Registration Insurance Type  Successfully "
+            response["status_code"] = 200
         return response
+
+
+@app.route('/create-insurance-provider', methods=['POST'])
+def insurance_provider():
+    response = {}
+
+    if request.method == "POST":
+        address = request.form['address']
+        phone = request.form['phone']
+        website = request.form['website']
+        special_conditions = request.form['special_condition']
+        licence = request.form['licence']
+
+        with sqlite3.connect('restaurant.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO tlbInsurance_provider("
+                           "address,"
+                           "phone,"
+                           "website,"
+                           "special_condition,"
+                           "licence) VALUES(?, ?, ?, ?, ?)",
+                           (address, phone, website, special_conditions, licence))
+            conn.commit()
+            response["message"] = "Registration Insurance Provider  Successfully "
+            response["status_code"] = 200
+        return response
+
+
+@app.route('/cerate-registerd-insurance', methods=['POST'])
+def registered_insurance():
+    response = {}
+
+    if request.method == "POST":
+        start_date = request.form['start_date']
+        end_date = request.form['end_date']
+        payment_info = request.form['payment_information']
+        special_features = request.form['special_features']
+
+        with sqlite3.connect('restaurant.db') as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO tlbRegisteredInsurance("
+                           "sales_date,"
+                           "payment_info) VALUES(?, ?, ?, ?)",
+                           (start_date, payment_info, end_date, special_features))
+            conn.commit()
+            response["message"] = "Registration Insurances  Successfully "
+            response["status_code"] = 200
+        return response
+
 # --------------Viewing My Information ------------------
 
 
@@ -271,80 +305,73 @@ def view_profile():
     return jsonify(response)
 
 
-@app.route("/view-reservation/", methods=['GET'])
-def view_reservation():
+@app.route('/view-vehicles', methods=['GET'])
+def view_vehicles():
     response = {}
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
-        cursor.execute("SELECT * FROM tlbReservation")
-        results = cursor.fetchall()
-        reserve = []
+        cursor.execute("SELECT * FROM tlbVehicles ")
 
-        for i in results:
-            reserve.append({x: i[x] for x in i.keys()})
         response["status_code"] = 200
-        response["data"] = tuple(reserve)
-        response["description"] = "Displaying Reservation Successfully"
+        response["description"] = "Profile fetched Successfully"
+        response["data"] = cursor.fetchall()
+
     return jsonify(response)
 
 
-@app.route("/view-cashier", methods=['GET', "POST"])
-def view_cashier():
+@app.route('/view-sales', methods=['GET'])
+def view_sales():
     response = {}
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
-        cursor.execute("SELECT * FROM tlbCashier")
-        results = cursor.fetchall()
-        cash = []
+        cursor.execute("SELECT * FROM tlbSales")
 
-        for i in results:
-            cash.append({x: i[x] for x in i.keys()})
         response["status_code"] = 200
-        response["data"] = tuple(cash)
-        response["description"] = "Displaying Cashier Successfully"
+        response["description"] = "Profile fetched Successfully"
+        response["data"] = cursor.fetchall()
+
     return jsonify(response)
 
 
-@app.route("/view-payment", methods=["GET"])
-def view_payslip():
+@app.route('/insurance-type')
+def view_insurance_type():
     response = {}
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
-        cursor.execute("SELECT * FROM tlbPayment")
-        results = cursor.fetchall()
-        pay = []
+        cursor.execute("SELECT * FROM tlbInsurance_type ")
 
-        for i in results:
-            pay.append({x: i[x] for x in i.keys()})
         response["status_code"] = 200
-        response["data"] = tuple(pay)
-        response["description"] = "Displaying Payments Successfully"
-    return jsonify(response)
+        response["description"] = "Profile fetched Successfully"
+        response["data"] = cursor.fetchall()
 
 
-@app.route("/view-employee", methods=['GET'])
-def view_employee():
+@app.route('/insurance-provider', methods=['GET'])
+def view_insurance_provider():
     response = {}
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.row_factory = sqlite3.Row
-        cursor.execute("SELECT * FROM tlbEmployee")
-        results = cursor.fetchall()
-        employ = []
+        cursor.execute("SELECT * FROM tlbInsurance_provider ")
 
-        for i in results:
-            employ.append({x: i[x] for x in i.keys()})
         response["status_code"] = 200
-        response["data"] = tuple(employ)
-        response["description"] = "Displaying Employee Successfully"
-    return jsonify(response)
+        response["description"] = "Profile fetched Successfully"
+        response["data"] = cursor.fetchall()
+
+
+@app.route('/registered-insurance', methods=['GET'])
+def view_registered_insurance():
+    response = {}
+
+    with sqlite3.connect("restaurant.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM tlbRegisteredInsurance ")
+
+        response["status_code"] = 200
+        response["description"] = "Profile fetched Successfully"
+        response["data"] = cursor.fetchall()
 
 # ------------------------- Removing/Deleting my Information------------------------------
 
@@ -361,59 +388,66 @@ def remove_customer(customer_id):
 
     return response
 
-
-@app.route("/delete-reservation/<int:reservation_id>", methods=['POST'])
-def remove_reservation(reservation_id):
+@app.route('/delete-vehicle/<int:vehicle_id>', methods=['POST'])
+def remove_vehicle(vehicle_id):
     response = {}
-
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbReservation WHERE RES_id=" + str(reservation_id))
+        cursor.execute("DELETE FROM tlbVehicles WHERE VHC_id=" + str(vehicle_id))
         conn.commit()
         response['status_code'] = 200
-        response['message'] = "Reservation Cancelled Successfully"
+        response['message'] = "Vehicle Removed Successfully"
 
     return response
 
 
-@app.route("/delete-payment/<int:payment_id>", methods=["POST"])
-def remove_payment(payment_id):
+@app.route('/delete-sales/<int:sales_id>', methods=['POST'])
+def remove_sales(sales_id):
     response = {}
-
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbPayment WHERE Pay_id=" + str(payment_id))
+        cursor.execute("DELETE FROM tlbSales WHERE Sale_id=" + str(sales_id))
         conn.commit()
         response['status_code'] = 200
-        response['message'] = "Payment Cancelled Successfully"
+        response['message'] = "Customer Removed Successfully"
 
     return response
 
 
-@app.route("/delete-cashier/<int:cashier_id>", methods=["POST"])
-def remove_cashier(cashier_id):
+@app.route('/delete-insurance-type/<int:ins_type_id>')
+def remove_insurance_type(ins_type_id):
     response = {}
-
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbCashier WHERE Cash_id=" + str(cashier_id))
+        cursor.execute("DELETE FROM tlbInsurance_type WHERE INS_id=" + str(ins_type_id))
         conn.commit()
         response['status_code'] = 200
-        response['message'] = "Cashier Removed Successfully"
+        response['message'] = "Insurance Type Removed Successfully"
+    return response
+
+
+@app.route('/delete-insurance-provider/<int:ins_pro_id>', methods=['POST'])
+def remove_insurance_provider(ins_pro_id):
+    response = {}
+    with sqlite3.connect("restaurant.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM tlbInsurance_provider WHERE Insure_prov_id=" + str(ins_pro_id))
+        conn.commit()
+        response['status_code'] = 200
+        response['message'] = "Insurance Provider Removed Successfully"
 
     return response
 
 
-@app.route("/delete-employee/<int:employee_id>", methods=["POST"])
-def remove_employee(employee_id):
+@app.route('/delete-registered-insurance/<int:reg_ins_id>', methods=['POST'])
+def remove_registerd_insurance(reg_ins_id):
     response = {}
-
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbEmployee WHERE id=?" + str(employee_id))
+        cursor.execute("DELETE FROM tlbRegisteredInsurance WHERE Reg_insurance_id=" + str(reg_ins_id))
         conn.commit()
         response['status_code'] = 200
-        response['message'] = "Employee Removed Successfully"
+        response['message'] = "Registered Insurance Removed Successfully"
 
     return response
 
@@ -474,100 +508,6 @@ def update_customer(customer_id):
                     conn.commit()
                     response['message'] = "Updating Email Successfully"
                     return response
-
-
-@app.route("/update-reservation/<int:reservation_id>", methods=["PUT"])
-def update_reservation(reservation_id):
-    response = {}
-    if request.method == "PUT":
-        with sqlite3.connect("restaurant.db") as conn:
-            cursor = conn.cursor()
-            incoming_data = dict(request.json)
-            put_data = {}
-
-            if incoming_data.get("Res_event") is not None:
-                put_data["Res_event"] = incoming_data.get("Res_event")
-                with sqlite3.connect("restaurant.db") as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbReservation SET Res_event=? WHERE RES_id=", (put_data["Res_event"], reservation_id))
-                    conn.commit()
-                    response['message'] = "Updating Customer Reservation Event Successful"
-                    response['status_code'] = 200
-                return response
-
-            if incoming_data.get("No_of_person") is not None:
-                put_data["No_of_person"] = incoming_data.get("No_of_person")
-                with sqlite3.connect("restaurant.db") as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE ltbReservation SET No_of_person=? WHERE RES_id=", (put_data["No_of_person"], reservation_id))
-                    conn.commit()
-                    response['message'] = "Updating Customer Reservation successfully"
-                    response['status_code'] = 200
-
-            if incoming_data.get("Res_date") is not None:
-                put_data["Res_date"] = incoming_data.get("Res_date")
-                with sqlite3.connect("restaurant.db") as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbReservation SET Res_date=? WHERE RES_id=", (put_data["Res_date"], reservation_id))
-                    conn.commit()
-                    response['message'] = "Updating Customer Reservation Date successfully"
-                    response['status_code'] = 200
-
-            if incoming_data.get('image') is not None:
-                put_data['image'] = incoming_data.get('image')
-                with sqlite3.connect('restaurant.db') as conn:
-                    cursor = conn.cursor()
-                    cursor.execute('UPDATE tlbReservation image=? WHERE RES_id=', (put_data['image'], reservation_id))
-                    conn.commit()
-                    response['message'] = "Updating Reservation Image Successfully"
-                    return response
-
-
-@app.route("/update-payment<int:payment_id>")
-def update_payment(payment_id):
-    response = {}
-    if request.method == "PUT":
-        with sqlite3.connect("restaurant.db") as conn:
-            cursor = conn.cursor()
-            incoming_data = dict(request.json)
-            put_data = {}
-
-            if incoming_data.get("Name_of_customer") is not None:
-                put_data["Name_of_customer"] = incoming_data.get("Name_of_customer")
-                with sqlite3.connect("restaurant.db") as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbPayment SET Name_of_customer=? WHERE Pay_id=", (put_data["Name_of_customer"], payment_id))
-                    conn.commit()
-                    response['message'] = "Updating Customer Name Successful"
-                    response['status_code'] = 200
-                return response
-
-            if incoming_data.get("Name_of_cashier") is not None:
-                put_data["Name_of_cashier"] = incoming_data.get("Name_of_cashier")
-                with sqlite3.connect("restaurant.db") as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE ltbPayment SET Name_of_cashier=? WHERE Pay_id=", (put_data["Name_of_cashier"], payment_id))
-                    conn.commit()
-                    response['message'] = "Updating Customer Payment successfully"
-                    response['status_code'] = 200
-
-            if incoming_data.get("Res_date") is not None:
-                put_data["Res_date"] = incoming_data.get("Res_date")
-                with sqlite3.connect("restaurant.db") as conn:
-                    cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbPayment SET Res_date= WHERE Pay_id=", (put_data["Res_date"], payment_id))
-                    conn.commit()
-                    response['message'] = "Updating Customer Payment Date successfully"
-                    response['status_code'] = 200
-            #
-            # if incoming_data.get('image') is not None:
-            #     put_data['image'] = incoming_data.get('image')
-            #     with sqlite3.connect('restaurant.db') as conn:
-            #         cursor = conn.cursor()
-            #         cursor.execute('UPDATE tlbPayment image=? WHERE Pay_id=?', (put_data['image'], payment_id))
-            #         conn.commit()
-            #         response['message'] = "Updating Payment Image Successfully"
-            #         return response
 
 
 if __name__ == '__main__':
