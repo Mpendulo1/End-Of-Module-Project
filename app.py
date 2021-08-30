@@ -178,7 +178,7 @@ def create_vehicles():
         price = request.form['price']
         year = request.form['year']
         description = request.form['description']
-        transition = request.form['transtion']
+        transition = request.form['transigtion']
         image = request.form['image']
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
@@ -266,7 +266,7 @@ def insurance_provider():
         return response
 
 
-@app.route('/cerate-registerd-insurance', methods=['POST'])
+@app.route('/cerate-registered-insurance', methods=['POST'])
 def registered_insurance():
     response = {}
 
@@ -509,6 +509,76 @@ def update_customer(customer_id):
                     response['message'] = "Updating Email Successfully"
                     return response
 
+
+@app.route('/edit-vehicle/<int:vehicle_id>', methods=['PUT'])
+def update_vehicle(vehicle_id):
+    response = {}
+    if request.method == "PUT":
+        with sqlite3.connect("restaurant.db") as conn:
+            cursor = conn.cursor()
+            incoming_data = dict(request.json)
+            put_data = {}
+
+            if incoming_data.get("name") is not None:
+                put_data["name"] = incoming_data.get("name")
+                with sqlite3.connect("restaurant.db") as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE tlbVehicles SET name=? WHERE VHC_id=?", (put_data["name"], vehicle_id))
+                    conn.commit()
+                    response['message'] = "Updating Customer Details Successful"
+                    response['status_code'] = 200
+                return response
+
+            if incoming_data.get("brand") is not None:
+                put_data["brand"] = incoming_data.get("brand")
+                with sqlite3.connect("restaurant.db") as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE tlbVehicles SET brand=? WHERE VHC_id=?", (put_data["brand"], vehicle_id))
+                    conn.commit()
+                    response['message'] = "Updating Customer Details Successful"
+                    response['status_code'] = 200
+                return response
+
+            if incoming_data.get("type") is not None:
+                put_data["type"] = incoming_data.get("type")
+                with sqlite3.connect("restaurant.db") as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE tlbVehicles SET type=? WHERE VHC_id=?", (put_data["type"], vehicle_id))
+                    conn.commit()
+                    response['message'] = "Updating Customer Details Successful"
+                    response['status_code'] = 200
+                return response
+
+            if incoming_data.get("price") is not None:
+                put_data["price"] = incoming_data.get("price")
+                with sqlite3.connect("restaurant.db") as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE tlbVehicles SET price=? WHERE VHC_id=?", (put_data["price"], vehicle_id))
+                    conn.commit()
+                    response['message'] = "Updating Customer Details Successful"
+                    response['status_code'] = 200
+                return response
+
+            if incoming_data.get("year") is not None:
+                put_data["year"] = incoming_data.get("year")
+                with sqlite3.connect("restaurant.db") as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE tlbVehicles SET year=? WHERE VHC_id=?", (put_data["year"], vehicle_id))
+                    conn.commit()
+                    response['message'] = "Updating Customer Details Successful"
+                    response['status_code'] = 200
+                return response
+
+
+            if incoming_data.get("image") is not None:
+                put_data["image"] = incoming_data.get("image")
+                with sqlite3.connect("restaurant.db") as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE tlbVehicles SET image=? WHERE VHC_id=?", (put_data["image"], vehicle_id))
+                    conn.commit()
+                    response['message'] = "Updating Customer Details Successful"
+                    response['status_code'] = 200
+                return response
 
 if __name__ == '__main__':
     app.run(debug=True)
