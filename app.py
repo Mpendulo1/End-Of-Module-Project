@@ -122,6 +122,12 @@ user = fetch_customers()
 customer_table = {u.username: u for u in user}
 userid_table = {u.id: u for u in user}
 
+def dict_factory(cursor, row):
+    d = {}
+    for idx, col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
 app = Flask(__name__)
 CORS(app)
 app.debug = True
@@ -157,23 +163,25 @@ def user_registration():
         return response
 
 
-@app.route("/user-login/", methods=["POST"])
+@app.route("/user-login/", methods=["PATCH"])
 def player_login():
     response = {}
 
-    if request.method == "POST":
+    if request.method == "PATCH":
         try:
             username = request.json["username"]
             password = request.json["password"]
 
             with sqlite3.connect("restaurant.db") as conn:
+                conn.row_factory = dict_factory
                 cursor = conn.cursor()
-                cursor.execute("SELECT username, password FROM tlbCustomers("
+                cursor.execute("SELECT * FROM tlbCustomers("
                                "username,"
                                "password) VALUES(?, ?)", (username, password))
-
+                user = cursor.fetchone()
             response['status_code'] = 200
-            response['message'] = "success"
+            response['message'] = "Account"+ str(username) +"collected"
+            response['data'] = user
             return response
         except ValueError:
             response["message"] = "Please enter correct details"
