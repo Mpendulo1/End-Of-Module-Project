@@ -8,46 +8,36 @@ from flask_cors import CORS
 
 
 class User(object):
-    def __init__(self, id, email, password):
+    def __init__(self, id, username, password):
         self.id = id
-        self.email = email
+        self.username = username
         self.password = password
 
 
-# def authenticate(email, password):
-#     user = customer_table.get(email, None)
-#     if user and hmac.compare_digest(user.password.encode('utf-8'), password.encode('utf-8')):
-#         return user
-
-
-# def identity(payload):
-#     user_id = payload['identity']
-#     return userid_table.get(user_id, None)
-
-
-class Items(object):
-    def __init__(self, product_id, name, price, description, product_type):
-        self.id = product_id
-        self.name = name
-        self.price = price
-        self.description = description
-        self.type = product_type
-
 
 def customers():
-    conn = sqlite3.connect('restaurant.db')
-    print("Opened database successfully")
+    with sqlite3.connect("restaurant.db") as conn:
+        conn = sqlite3.connect('restaurant.db')
+        print("Opened database successfully")
+        conn.execute("CREATE TABLE IF NOT EXISTS tlbCustomers(CST_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                    "firstname TEXT NOT NULL,"
+                    "lastname TEXT NOT NULL,"
+                    "contact INT NOT NULL,"
+                    "password TEXT NOT NULL,"
+                    "username TEXT NOT NULL,"
+                    "email TEXT NOT NULL)")
+        print("Customer table created successfully")
+        conn.close()
 
-    conn.execute("CREATE TABLE IF NOT EXISTS tlbCustomers(CST_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                 "firstname TEXT NOT NULL,"
-                 "lastname TEXT NOT NULL,"
-                 "contact INT NOT NULL,"
-                 "password TEXT NOT NULL,"
-                 "username TEXT NOT NULL,"
-                 "email TEXT NOT NULL)")
-    print("Customer table created successfully")
-    conn.close()
-
+def login_customers():
+    with sqlite3.connect('restaurant.db') as conn:
+        conn = sqlite3.connect('restaurant.db')
+        conn.execute('CREATE TABLE IF NOT EXISTS tlbLogin_customers(Login_id INTEGER PRIMARY KEY AUTOINCREMENT,'
+                     'username TXT NOT NULL,'
+                     'password TEXT NOT NULL,'
+                     'CONSTRAINT fk_user FOREIGN KEY (Login_id) REFERENCES tlbCustomers(CST_id))')
+        print('LOGIN TABLE CREATED successfully')
+        conn.close()
 
 def vehicles():
     with sqlite3.connect("restaurant.db") as conn:
@@ -125,10 +115,11 @@ vehicles()
 sales()
 registered_insurance()
 insurance_provider()
+login_customers()
 insurance_type()
 user = fetch_customers()
 
-customer_table = {u.email: u for u in user}
+customer_table = {u.username: u for u in user}
 userid_table = {u.id: u for u in user}
 
 app = Flask(__name__)
@@ -143,12 +134,12 @@ def user_registration():
 
     if request.method == "POST":
 
-        first_name = request.form['firstname']
-        last_name = request.form['lastname']
-        address = request.form['contact']
-        email = request.form['username']
-        username = request.form['password']
-        password = request.form['email']
+        first_name = request.json['firstname']
+        last_name = request.json['lastname']
+        address = request.json['contact']
+        email = request.json['username']
+        username = request.json['password']
+        password = request.json['email']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
@@ -166,20 +157,45 @@ def user_registration():
         return response
 
 
+@app.route("/user-login/", methods=["POST"])
+def player_login():
+    response = {}
+
+    if request.method == "POST":
+        try:
+            username = request.json["username"]
+            password = request.json["password"]
+
+            with sqlite3.connect("restaurant.db") as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT username, password FROM tlbCustomers("
+                               "username,"
+                               "password) VALUES(?, ?)", (username, password))
+
+            response['status_code'] = 200
+            response['message'] = "success"
+            return response
+        except ValueError:
+            response["message"] = "Please enter correct details"
+            response["status_code"] = 400
+            return response
+
+
+# PLAYER REGISTRATION
+
 @app.route('/create-vehicles', methods=['POST'])
 def create_vehicles():
     response = {}
 
     if request.method == "POST":
-
-        name = request.form['name']
-        brand = request.form['brand']
-        type = request.form['type']
-        price = request.form['price']
-        year = request.form['year']
-        description = request.form['description']
-        transition = request.form['transigtion']
-        image = request.form['image']
+        name = request.json['name']
+        brand = request.json['brand']
+        type = request.json['type']
+        price = request.json['price']
+        year = request.json['year']
+        description = request.json['description']
+        transition = request.json['transigtion']
+        image = request.json['image']
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO tlbVehicles("
@@ -203,8 +219,8 @@ def create_sales():
     response = {}
 
     if request.method == "POST":
-        sales_date = request.form['sales_date']
-        payment_info = request.form['payment_info']
+        sales_date = request.json['sales_date']
+        payment_info = request.json['payment_info']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
@@ -223,9 +239,9 @@ def insurance_type():
     response = {}
 
     if request.method == "POST":
-        period = request.form['insurance_period']
-        amount = request.form['amount']
-        condition = request.form['insurance_condition']
+        period = request.json['insurance_period']
+        amount = request.json['amount']
+        condition = request.json['insurance_condition']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
@@ -245,11 +261,11 @@ def insurance_provider():
     response = {}
 
     if request.method == "POST":
-        address = request.form['address']
-        phone = request.form['phone']
-        website = request.form['website']
-        special_conditions = request.form['special_condition']
-        licence = request.form['licence']
+        address = request.json['address']
+        phone = request.json['phone']
+        website = request.json['website']
+        special_conditions = request.json['special_condition']
+        licence = request.json['licence']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
@@ -266,15 +282,15 @@ def insurance_provider():
         return response
 
 
-@app.route('/cerate-registered-insurance', methods=['POST'])
+@app.route('/create-registered-insurance', methods=['POST'])
 def registered_insurance():
     response = {}
 
     if request.method == "POST":
-        start_date = request.form['start_date']
-        end_date = request.form['end_date']
-        payment_info = request.form['payment_information']
-        special_features = request.form['special_features']
+        start_date = request.json['start_date']
+        end_date = request.json['end_date']
+        payment_info = request.json['payment_information']
+        special_features = request.json['special_features']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
@@ -387,6 +403,7 @@ def remove_customer(customer_id):
         response['message'] = "Customer Removed Successfully"
 
     return response
+
 
 @app.route('/delete-vehicle/<int:vehicle_id>', methods=['POST'])
 def remove_vehicle(vehicle_id):
