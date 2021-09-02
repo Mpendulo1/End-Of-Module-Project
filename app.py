@@ -164,7 +164,7 @@ def user_registration():
 
 
 @app.route("/user-login/", methods=["PATCH"])
-def player_login():
+def user_login():
     response = {}
 
     if request.method == "PATCH":
@@ -175,12 +175,10 @@ def player_login():
             with sqlite3.connect("restaurant.db") as conn:
                 conn.row_factory = dict_factory
                 cursor = conn.cursor()
-                cursor.execute("SELECT * FROM tlbCustomers("
-                               "username,"
-                               "password) VALUES(?, ?)", (username, password))
+                cursor.execute("SELECT * FROM tlbCustomers WHERE username=? AND password=?", (username, password))
                 user = cursor.fetchone()
             response['status_code'] = 200
-            response['message'] = "Account"+ str(username) +"collected"
+            response['message'] = "Account" + str(username) + "collected"
             response['data'] = user
             return response
         except ValueError:
@@ -202,7 +200,7 @@ def create_vehicles():
         price = request.json['price']
         year = request.json['year']
         description = request.json['description']
-        transition = request.json['transigtion']
+        transition = request.json['transition']
         image = request.json['image']
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
