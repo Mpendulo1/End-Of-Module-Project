@@ -387,12 +387,12 @@ def view_insurance_provider():
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM tlbInsurance_form ")
+        cursor.execute("SELECT * FROM  tlbInsurance_form")
 
         response["status_code"] = 200
         response["description"] = "Profile fetched Successfully"
         response["data"] = cursor.fetchall()
-
+    return response
 
 @app.route('/registered-insurance', methods=['GET'])
 def view_registered_insurance():
