@@ -75,13 +75,17 @@ def insurance_type():
 
 def insurance_provider():
     with sqlite3.connect("restaurant.db") as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS tlbInsurance_provider(Insure_prov_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                     "address TXT NOT NULL,"
-                     "phone TEXT NOT NULL,"
-                     "website TXT NOT NULL,"
-                     "special_condition TXT NOT NULL,"
+        conn.execute("CREATE TABLE IF NOT EXISTS tlbInsurance_form(Insure_form_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                     "Name TXT NOT NULL,"
+                     "Surname TEXT NOT NULL,"
+                     "Phone TXT NOT NULL,"
+                     "Address TXT NOT NULL,"
+                     "Email TXT NOT NULL,"
+                     "Type_of_vehicle TXT NOT NULL,"
+                     "Number_of_vehicle TXT NUT NULL,"
+                     "Radius_of_speculation TXT NOT NULL,"
                      "licence TXT NOT NULL)")
-        print("Employee table created successfully")
+        print("Insurance table created successfully")
 
 def registered_insurance():
     with sqlite3.connect("restaurant.db") as conn:
@@ -91,7 +95,7 @@ def registered_insurance():
                      "payment_information TXT NOT NULL,"
                      "special_features TXT NOT NULL,"
                      "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(VHC_id),"
-                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(Insure_prov_id),"
+                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(Insure_form_id),"
                      "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(Sale_id),"
                      "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(INS_id),"
                      "CONSTRAINT fk_vehicles FOREIGN KEY (payment_information) REFERENCES tlbVehicles(CST_id))")
@@ -267,21 +271,28 @@ def insurance_provider():
     response = {}
 
     if request.method == "POST":
-        address = request.json['address']
-        phone = request.json['phone']
-        website = request.json['website']
-        special_conditions = request.json['special_condition']
+        name = request.json['Name']
+        surname = request.json['Surname']
+        phone = request.json['Phone']
+        address = request.json['Address']
+        email = request.json['Email']
         licence = request.json['licence']
+        type_of_vehicle = request.json['Type_of_vehicle']
+        number_of_vehicle = request.json['Number_of_vehicle']
+        radius_of_operation = request.json['Radius_of_speculation']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO tlbInsurance_provider("
-                           "address,"
-                           "phone,"
-                           "website,"
-                           "special_condition,"
-                           "licence) VALUES(?, ?, ?, ?, ?)",
-                           (address, phone, website, special_conditions, licence))
+            cursor.execute("INSERT INTO tlbInsurance_form("
+                           "Name,"
+                           "Surname,"
+                           "Address,"
+                           "Email,"
+                           "Type_of_vehicle,"
+                           "Number_of_vehicle,"
+                           "Radius_of_speculation,"
+                           "licence) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                           (name, surname, address, email, type_of_vehicle, number_of_vehicle, radius_of_operation, phone, licence))
             conn.commit()
             response["message"] = "Registration Insurance Provider  Successfully "
             response["status_code"] = 200
@@ -376,7 +387,7 @@ def view_insurance_provider():
 
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM tlbInsurance_provider ")
+        cursor.execute("SELECT * FROM tlbInsurance_form ")
 
         response["status_code"] = 200
         response["description"] = "Profile fetched Successfully"
