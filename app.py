@@ -255,7 +255,7 @@ def insurance_type():
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO tlbInsurance_type("
+            cursor.execute("INSERT OR REPLACE INTO tlbInsurance_type("
                            "insurance_period,"
                            "amount,"
                            "insurance_condition) VALUES(?, ?, ?)",
