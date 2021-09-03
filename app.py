@@ -288,10 +288,11 @@ def insurance_provider():
                            "Surname,"
                            "Address,"
                            "Email,"
+                           "Phone,"
                            "Type_of_vehicle,"
                            "Number_of_vehicle,"
                            "Radius_of_speculation,"
-                           "licence) VALUES(?, ?, ?, ?, ?, ?, ?, ?)",
+                           "licence) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
                            (name, surname, address, email, type_of_vehicle, number_of_vehicle, radius_of_operation, phone, licence))
             conn.commit()
             response["message"] = "Registration Insurance Provider  Successfully "
