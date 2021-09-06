@@ -75,14 +75,14 @@ def insurance_type():
 
 def insurance_provider():
     with sqlite3.connect("restaurant.db") as conn:
-        conn.execute("CREATE TABLE IF NOT EXISTS tlbInsurance_form(Insure_form_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+        conn.execute("CREATE TABLE IF NOT EXISTS tlbInsurance_form( Insure_form_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      "Name TXT NOT NULL,"
                      "Surname TEXT NOT NULL,"
                      "Phone TXT NOT NULL,"
                      "Address TXT NOT NULL,"
                      "Email TXT NOT NULL,"
                      "Type_of_vehicle TXT NOT NULL,"
-                     "Number_of_vehicle TXT NUT NULL,"
+                     "Number_of_vehicle TXT NOT NULL,"
                      "Radius_of_speculation TXT NOT NULL,"
                      "licence TXT NOT NULL)")
         print("Insurance table created successfully")
@@ -271,15 +271,15 @@ def insurance_provider():
     response = {}
 
     if request.method == "POST":
-        name = request.json['Name']
-        surname = request.json['Surname']
-        phone = request.json['Phone']
-        address = request.json['Address']
-        email = request.json['Email']
-        licence = request.json['licence']
-        type_of_vehicle = request.json['Type_of_vehicle']
-        number_of_vehicle = request.json['Number_of_vehicle']
-        radius_of_operation = request.json['Radius_of_speculation']
+        name = request.form['Name']
+        surname = request.form['Surname']
+        phone = request.form['Phone']
+        address = request.form['Address']
+        email = request.form['Email']
+        licence = request.form['licence']
+        type_of_vehicle = request.form['Type_of_vehicle']
+        number_of_vehicle = request.form['Number_of_vehicle']
+        radius_of_operation = request.form['Radius_of_speculation']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
