@@ -271,15 +271,15 @@ def insurance_provider():
     response = {}
 
     if request.method == "POST":
-        name = request.form['Name']
-        surname = request.form['Surname']
-        phone = request.form['Phone']
-        address = request.form['Address']
-        email = request.form['Email']
-        licence = request.form['licence']
-        type_of_vehicle = request.form['Type_of_vehicle']
-        number_of_vehicle = request.form['Number_of_vehicle']
-        radius_of_operation = request.form['Radius_of_speculation']
+        name = request.json['Name']
+        surname = request.json['Surname']
+        phone = request.json['Phone']
+        address = request.json['Address']
+        email = request.json['Email']
+        licence = request.json['licence']
+        type_of_vehicle = request.json['Type_of_vehicle']
+        number_of_vehicle = request.json['Number_of_vehicle']
+        radius_of_operation = request.json['Radius_of_speculation']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
@@ -619,4 +619,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-    # 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
+    # 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
