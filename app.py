@@ -198,14 +198,14 @@ def create_vehicles():
     response = {}
 
     if request.method == "POST":
-        name = request.form['name']
-        brand = request.form['brand']
-        type = request.form['type']
-        price = request.form['price']
-        year = request.form['year']
-        description = request.form['description']
-        transition = request.form['transition']
-        image = request.form['image']
+        name = request.json['name']
+        brand = request.json['brand']
+        type = request.json['type']
+        price = request.json['price']
+        year = request.json['year']
+        description = request.json['description']
+        transition = request.json['transition']
+        image = request.json['image']
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO tlbVehicles("
@@ -619,4 +619,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-    # 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
+    # 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
