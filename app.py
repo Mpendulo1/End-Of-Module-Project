@@ -444,7 +444,7 @@ def remove_vehicle(VHC_id):
     response = {}
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbVehicles WHERE VHC_id=" + VHC_id)
+        cursor.execute("DELETE FROM tlbVehicles WHERE VHC_id='" + str(VHC_id) + "'")
         conn.commit()
         response['status_code'] = 200
         response['message'] = "Vehicle Removed Successfully"
@@ -640,4 +640,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-    # 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
+    # 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
