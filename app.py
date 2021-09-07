@@ -579,7 +579,7 @@ def update_vehicle(VHC_id):
                 put_data["name"] = incoming_data.get("name")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET name=? WHERE VHC_id=?", (put_data["name"], VHC_id))
+                    cursor.execute("UPDATE tlbVehicles SET name=? WHERE VHC_id=", (put_data["name"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -589,7 +589,7 @@ def update_vehicle(VHC_id):
                 put_data["brand"] = incoming_data.get("brand")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET brand=? WHERE VHC_id=?", (put_data["brand"], VHC_id))
+                    cursor.execute("UPDATE tlbVehicles SET brand=? WHERE VHC_id=", (put_data["brand"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -599,7 +599,7 @@ def update_vehicle(VHC_id):
                 put_data["type"] = incoming_data.get("type")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET type=? WHERE VHC_id=?", (put_data["type"], VHC_id))
+                    cursor.execute("UPDATE tlbVehicles SET type=? WHERE VHC_id=", (put_data["type"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -609,7 +609,7 @@ def update_vehicle(VHC_id):
                 put_data["price"] = incoming_data.get("price")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET price=? WHERE VHC_id=?", (put_data["price"], VHC_id))
+                    cursor.execute("UPDATE tlbVehicles SET price=? WHERE VHC_id=", (put_data["price"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -619,7 +619,7 @@ def update_vehicle(VHC_id):
                 put_data["year"] = incoming_data.get("year")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET year=? WHERE VHC_id=?", (put_data["year"], VHC_id))
+                    cursor.execute("UPDATE tlbVehicles SET year=? WHERE VHC_id=", (put_data["year"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -630,11 +630,12 @@ def update_vehicle(VHC_id):
                 put_data["image"] = incoming_data.get("image")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET image=? WHERE VHC_id=?", (put_data["image"], VHC_id))
+                    cursor.execute("UPDATE tlbVehicles SET image=? WHERE VHC_id=", (put_data["image"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
                 return response
+
 
 if __name__ == '__main__':
     app.run(debug=True)
