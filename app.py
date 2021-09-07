@@ -4,7 +4,7 @@
 import sqlite3
 from flask import Flask
 from flask_jwt import *
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 
 
 class User(object):
@@ -139,6 +139,7 @@ app.config['SECRETE_KEY'] = 'super-secret'
 
 
 @app.route('/customer-registration', methods=["POST"])
+@cross_origin()
 def user_registration():
     response = {}
 
@@ -168,6 +169,7 @@ def user_registration():
 
 
 @app.route("/user-login/", methods=["PATCH"])
+@cross_origin()
 def user_login():
     response = {}
 
@@ -194,18 +196,19 @@ def user_login():
 # PLAYER REGISTRATION
 
 @app.route('/create-vehicles', methods=['POST'])
+@cross_origin()
 def create_vehicles():
     response = {}
 
     if request.method == "POST":
-        name = request.form['name']
-        brand = request.form['brand']
-        type = request.form['type']
-        price = request.form['price']
-        year = request.form['year']
-        description = request.form['description']
-        transition = request.form['transition']
-        image = request.form['image']
+        name = request.json['name']
+        brand = request.json['brand']
+        type = request.json['type']
+        price = request.json['price']
+        year = request.json['year']
+        description = request.json['description']
+        transition = request.json['transition']
+        image = request.json['image']
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO tlbVehicles("
@@ -225,6 +228,7 @@ def create_vehicles():
 
 
 @app.route('/create-sales', methods=['POST'])
+@cross_origin()
 def create_sales():
     response = {}
 
@@ -245,6 +249,7 @@ def create_sales():
 
 
 @app.route('/create-insurance-type', methods=['POST'])
+@cross_origin()
 def insurance_type():
     response = {}
 
@@ -267,6 +272,7 @@ def insurance_type():
 
 
 @app.route('/create-insurance-provider', methods=['POST'])
+@cross_origin()
 def insurance_provider():
     response = {}
 
@@ -301,6 +307,7 @@ def insurance_provider():
 
 
 @app.route('/create-registered-insurance', methods=['POST'])
+@cross_origin()
 def registered_insurance():
     response = {}
 
@@ -325,6 +332,7 @@ def registered_insurance():
 
 
 @app.route('/customer-profile/', methods=['GET'])
+@cross_origin()
 def view_profile():
     response = {}
 
@@ -340,6 +348,7 @@ def view_profile():
 
 
 @app.route('/view-vehicles', methods=['GET'])
+@cross_origin()
 def view_vehicles():
     response = {}
 
@@ -355,6 +364,7 @@ def view_vehicles():
 
 
 @app.route('/view-sales', methods=['GET'])
+@cross_origin()
 def view_sales():
     response = {}
 
@@ -370,6 +380,7 @@ def view_sales():
 
 
 @app.route('/insurance-type')
+@cross_origin()
 def view_insurance_type():
     response = {}
 
@@ -383,6 +394,7 @@ def view_insurance_type():
 
 
 @app.route('/insurance-provider', methods=['GET'])
+@cross_origin()
 def view_insurance_provider():
     response = {}
 
@@ -395,7 +407,9 @@ def view_insurance_provider():
         response["data"] = cursor.fetchall()
     return response
 
+
 @app.route('/registered-insurance', methods=['GET'])
+@cross_origin()
 def view_registered_insurance():
     response = {}
 
@@ -411,6 +425,7 @@ def view_registered_insurance():
 
 
 @app.route('/delete-customer/<int:customer_id>', methods=['POST'])
+@cross_origin()
 def remove_customer(customer_id):
     response = {}
     with sqlite3.connect("restaurant.db") as conn:
@@ -423,12 +438,13 @@ def remove_customer(customer_id):
     return response
 
 
-@app.route('/delete-vehicle/<int:vehicle_id>', methods=['POST'])
-def remove_vehicle(vehicle_id):
+@app.route('/delete-vehicle/<int:VHC_id>', methods=['PUT'])
+@cross_origin()
+def remove_vehicle(VHC_id):
     response = {}
     with sqlite3.connect("restaurant.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM tlbVehicles WHERE VHC_id=" + str(vehicle_id))
+        cursor.execute("DELETE FROM tlbVehicles WHERE VHC_id=" + VHC_id)
         conn.commit()
         response['status_code'] = 200
         response['message'] = "Vehicle Removed Successfully"
@@ -436,7 +452,8 @@ def remove_vehicle(vehicle_id):
     return response
 
 
-@app.route('/delete-sales/<int:sales_id>', methods=['POST'])
+@app.route('/delete-sales/<int:sales_id>', methods=['PUT'])
+@cross_origin()
 def remove_sales(sales_id):
     response = {}
     with sqlite3.connect("restaurant.db") as conn:
@@ -450,6 +467,7 @@ def remove_sales(sales_id):
 
 
 @app.route('/delete-insurance-type/<int:ins_type_id>')
+@cross_origin()
 def remove_insurance_type(ins_type_id):
     response = {}
     with sqlite3.connect("restaurant.db") as conn:
@@ -462,6 +480,7 @@ def remove_insurance_type(ins_type_id):
 
 
 @app.route('/delete-insurance-provider/<int:ins_pro_id>', methods=['POST'])
+@cross_origin()
 def remove_insurance_provider(ins_pro_id):
     response = {}
     with sqlite3.connect("restaurant.db") as conn:
@@ -475,6 +494,7 @@ def remove_insurance_provider(ins_pro_id):
 
 
 @app.route('/delete-registered-insurance/<int:reg_ins_id>', methods=['POST'])
+@cross_origin()
 def remove_registerd_insurance(reg_ins_id):
     response = {}
     with sqlite3.connect("restaurant.db") as conn:
@@ -489,8 +509,9 @@ def remove_registerd_insurance(reg_ins_id):
 # -----------------------------Updating/Editing my Information----------------------------------------
 
 
-@app.route('/update-customer/<int:customer_id>/', methods=["PUT"])
-def update_customer(customer_id):
+@app.route('/update-customer/<int:CST_id>/', methods=["PUT"])
+@cross_origin()
+def update_customer(CST_id):
     response = {}
     if request.method == "PUT":
         with sqlite3.connect("restaurant.db") as conn:
@@ -502,7 +523,7 @@ def update_customer(customer_id):
                 put_data["firstname"] = incoming_data.get("firstname")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbCustomers SET firstname=? WHERE CST_id=", (put_data["firstname"], customer_id))
+                    cursor.execute("UPDATE tlbCustomers SET firstname=? WHERE CST_id=", (put_data["firstname"], CST_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -512,7 +533,7 @@ def update_customer(customer_id):
                 put_data["lastname"] = incoming_data.get("lastname")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE ltbCustomers SET lastname=? WHERE CST_id=", (put_data["lastname"], customer_id))
+                    cursor.execute("UPDATE ltbCustomers SET lastname=? WHERE CST_id=", (put_data["lastname"], CST_id))
                     conn.commit()
                     response['message'] = "Updating Customer Last Name successfully"
                     response['status_code'] = 200
@@ -521,7 +542,7 @@ def update_customer(customer_id):
                 put_data["contact"] = incoming_data.get("contact")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbCustomers SET contact=? WHERE CST_id=", (put_data["contact"], customer_id))
+                    cursor.execute("UPDATE tlbCustomers SET contact=? WHERE CST_id=", (put_data["contact"], CST_id))
                     conn.commit()
                     response['message'] = "Updating Customer Contact successfully"
                     response['status_code'] = 200
@@ -530,7 +551,7 @@ def update_customer(customer_id):
                 put_data['password'] = incoming_data.get('password')
                 with sqlite3.connect('restaurant.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute('UPDATE tlbCustomers password=? WHERE CST_id=', (put_data['password'], customer_id))
+                    cursor.execute('UPDATE tlbCustomers password=? WHERE CST_id=', (put_data['password'], CST_id))
                     conn.commit()
                     response['message'] = "Updating Password Successfully"
                     return response
@@ -539,14 +560,14 @@ def update_customer(customer_id):
                 put_data['email'] = incoming_data.get('email')
                 with sqlite3.connect('restaurant.db') as conn:
                     cursor = conn.cursor()
-                    cursor.execute('UPDATE tlbCustomers email=? WHERE CST_id=', (put_data['email'], customer_id))
+                    cursor.execute('UPDATE tlbCustomers email=? WHERE CST_id=', (put_data['email'], CST_id))
                     conn.commit()
                     response['message'] = "Updating Email Successfully"
                     return response
 
 
-@app.route('/edit-vehicle/<int:vehicle_id>', methods=['PUT'])
-def update_vehicle(vehicle_id):
+@app.route('/edit-vehicle/<int:VHC_id>', methods=['PUT'])
+def update_vehicle(VHC_id):
     response = {}
     if request.method == "PUT":
         with sqlite3.connect("restaurant.db") as conn:
@@ -558,7 +579,7 @@ def update_vehicle(vehicle_id):
                 put_data["name"] = incoming_data.get("name")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET name=? WHERE VHC_id=?", (put_data["name"], vehicle_id))
+                    cursor.execute("UPDATE tlbVehicles SET name=? WHERE VHC_id=?", (put_data["name"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -568,7 +589,7 @@ def update_vehicle(vehicle_id):
                 put_data["brand"] = incoming_data.get("brand")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET brand=? WHERE VHC_id=?", (put_data["brand"], vehicle_id))
+                    cursor.execute("UPDATE tlbVehicles SET brand=? WHERE VHC_id=?", (put_data["brand"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -578,7 +599,7 @@ def update_vehicle(vehicle_id):
                 put_data["type"] = incoming_data.get("type")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET type=? WHERE VHC_id=?", (put_data["type"], vehicle_id))
+                    cursor.execute("UPDATE tlbVehicles SET type=? WHERE VHC_id=?", (put_data["type"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -588,7 +609,7 @@ def update_vehicle(vehicle_id):
                 put_data["price"] = incoming_data.get("price")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET price=? WHERE VHC_id=?", (put_data["price"], vehicle_id))
+                    cursor.execute("UPDATE tlbVehicles SET price=? WHERE VHC_id=?", (put_data["price"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -598,7 +619,7 @@ def update_vehicle(vehicle_id):
                 put_data["year"] = incoming_data.get("year")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET year=? WHERE VHC_id=?", (put_data["year"], vehicle_id))
+                    cursor.execute("UPDATE tlbVehicles SET year=? WHERE VHC_id=?", (put_data["year"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -609,7 +630,7 @@ def update_vehicle(vehicle_id):
                 put_data["image"] = incoming_data.get("image")
                 with sqlite3.connect("restaurant.db") as conn:
                     cursor = conn.cursor()
-                    cursor.execute("UPDATE tlbVehicles SET image=? WHERE VHC_id=?", (put_data["image"], vehicle_id))
+                    cursor.execute("UPDATE tlbVehicles SET image=? WHERE VHC_id=?", (put_data["image"], VHC_id))
                     conn.commit()
                     response['message'] = "Updating Customer Details Successful"
                     response['status_code'] = 200
@@ -619,4 +640,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-    # 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
+    # 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
