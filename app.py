@@ -7,6 +7,12 @@ from flask_jwt import *
 from flask_cors import CORS, cross_origin
 
 
+app = Flask(__name__)
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+app.debug = True
+app.config['SECRETE_KEY'] = 'super-secret'
+
+
 class User(object):
     def __init__(self, id, username, password):
         self.id = id
@@ -131,11 +137,6 @@ def dict_factory(cursor, row):
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
-
-app = Flask(__name__)
-CORS(app)
-app.debug = True
-app.config['SECRETE_KEY'] = 'super-secret'
 
 
 @app.route('/customer-registration', methods=["POST"])
@@ -641,4 +642,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-    # 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
+    # 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
