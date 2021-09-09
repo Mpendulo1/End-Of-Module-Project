@@ -84,13 +84,8 @@ def insurance_provider():
         conn.execute("CREATE TABLE IF NOT EXISTS tlbInsurance_form( Insure_form_id INTEGER PRIMARY KEY AUTOINCREMENT,"
                      "Name TXT NOT NULL,"
                      "Surname TEXT NOT NULL,"
-                     "Phone TXT NOT NULL,"
                      "Address TXT NOT NULL,"
-                     "Email TXT NOT NULL,"
-                     "Type_of_vehicle TXT NOT NULL,"
-                     "Number_of_vehicle TXT NOT NULL,"
-                     "Radius_of_speculation TXT NOT NULL,"
-                     "licence TXT NOT NULL)")
+                     "Email TXT NOT NULL)")
         print("Insurance table created successfully")
 
 def registered_insurance():
