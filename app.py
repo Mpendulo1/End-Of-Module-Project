@@ -63,10 +63,13 @@ def vehicles():
 def sales():
     with sqlite3.connect("restaurant.db") as conn:
         conn.execute("CREATE TABLE IF NOT EXISTS tlbSales(Sale_id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                     "sale_date TEXT NOT NULL,"
-                     "payment_info TXT NOT NULL,"
-                     "CONSTRAINT fk_vehicles FOREIGN KEY (payment_info) REFERENCES tlbVehicles(VHC_id),"
-                     "CONSTRAINT fk_employee FOREIGN KEY (sale_date) REFERENCES tlbCustomers(CST_id))")
+                     "cardName TEXT NOT NULL,"
+                     "cardNumber TXT NOT NULL,"
+                     "expMonth TXT NOT NULL,"
+                     "expYear TXT NOT NULL,"
+                     "cvv TXT NOT NULL,"
+                     "CONSTRAINT fk_vehicles FOREIGN KEY (Sale_id) REFERENCES tlbVehicles(VHC_id),"
+                     "CONSTRAINT fk_employee FOREIGN KEY (sale_id) REFERENCES tlbCustomers(CST_id))")
         print("Cashier table created successfully")
 
 
@@ -229,15 +232,21 @@ def create_sales():
     response = {}
 
     if request.method == "POST":
-        sales_date = request.json['sales_date']
-        payment_info = request.json['payment_info']
+        card_name = request.json['cardName']
+        card_number = request.json['cardNumber']
+        exp_month = request.json['expMonth']
+        exp_year = request.json['expYear']
+        cvv = request.json['cvv']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
             cursor.execute("INSERT INTO tlbSales("
-                           "sales_date,"
-                           "payment_info) VALUES(?, ?)",
-                           (sales_date, payment_info))
+                           "cardName,"
+                           "cardNumber,"
+                           "expMonth,"
+                           "expYear,"
+                           "cvv) VALUES(?, ?, ?, ?, ?)",
+                           (card_name, card_number, exp_year, exp_month, cvv))
             conn.commit()
             response["message"] = "Registration sales  Successfully "
             response["status_code"] = 200
@@ -275,13 +284,8 @@ def insurance_provider():
     if request.method == "POST":
         name = request.json['Name']
         surname = request.json['Surname']
-        phone = request.json['Phone']
         address = request.json['Address']
         email = request.json['Email']
-        licence = request.json['licence']
-        type_of_vehicle = request.json['Type_of_vehicle']
-        number_of_vehicle = request.json['Number_of_vehicle']
-        radius_of_operation = request.json['Radius_of_speculation']
 
         with sqlite3.connect('restaurant.db') as conn:
             cursor = conn.cursor()
@@ -289,13 +293,8 @@ def insurance_provider():
                            "Name,"
                            "Surname,"
                            "Address,"
-                           "Email,"
-                           "Phone,"
-                           "Type_of_vehicle,"
-                           "Number_of_vehicle,"
-                           "Radius_of_speculation,"
-                           "licence) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                           (name, surname, address, email, type_of_vehicle, number_of_vehicle, radius_of_operation, phone, licence))
+                           "Email) VALUES(?, ?, ?, ?)",
+                           (name, surname, address, email))
             conn.commit()
             response["message"] = "Registration Insurance Provider  Successfully "
             response["status_code"] = 200
@@ -637,4 +636,4 @@ if __name__ == '__main__':
     app.run(debug=True)
 
 
-    # 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
+    # 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
